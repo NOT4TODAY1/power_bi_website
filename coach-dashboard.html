@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coach Dashboard - CrossFit Games 2019</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Power BI Embedded JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/powerbi-client/2.23.1/powerbi.min.js"></script>
+
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    
+    :root {
+      --cf-red: #e51937;
+      --cf-black: #000000;
+      --cf-white: #ffffff;
+      --cf-gray: #333333;
+      --cf-light-gray: #666666;
+      --cf-bg: #0a0a0a;
+      --cf-border: #1a1a1a;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: var(--cf-bg);
+      min-height: 100vh;
+      color: var(--cf-white);
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(145deg, #0f0f0f 0%, #1a1a1a 100%);
+      border-bottom: 3px solid var(--cf-red);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo-small {
+      font-family: 'Oswald', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--cf-red);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(229, 25, 55, 0.5);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding-left: 20px;
+      border-left: 2px solid var(--cf-border);
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--cf-red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .user-details h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--cf-white);
+    }
+
+    .user-details p {
+      font-size: 12px;
+      color: var(--cf-light-gray);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .header-right {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .btn-secondary {
+      background: var(--cf-gray);
+      color: var(--cf-white);
+    }
+
+    .btn-secondary:hover {
+      background: var(--cf-light-gray);
+      transform: translateY(-2px);
+    }
+
+    .btn-logout {
+      background: var(--cf-red);
+      color: var(--cf-white);
+    }
+
+    .btn-logout:hover {
+      background: #c91530;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(229, 25, 55, 0.4);
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 30px 40px;
+    }
+
+    .welcome-section {
+      background: linear-gradient(145deg, #0f0f0f 0%, #1a1a1a 100%);
+      border: 2px solid var(--cf-border);
+      border-left: 4px solid var(--cf-red);
+      border-radius: 8px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .welcome-section h1 {
+      font-family: 'Oswald', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--cf-white);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .welcome-section p {
+      color: var(--cf-light-gray);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* Dashboard Tabs */
+    .dashboard-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--cf-border);
+      padding-bottom: 0;
+    }
+
+    .tab {
+      padding: 15px 30px;
+      background: transparent;
+      border: none;
+      color: var(--cf-light-gray);
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+      font-family: 'Roboto', sans-serif;
+      position: relative;
+    }
+
+    .tab:hover {
+      color: var(--cf-white);
+      background: rgba(229, 25, 55, 0.05);
+    }
+
+    .tab.active {
+      color: var(--cf-red);
+      border-bottom-color: var(--cf-red);
+      background: rgba(229, 25, 55, 0.1);
+    }
+
+    /* Power BI Container */
+    .powerbi-container {
+      background: linear-gradient(145deg, #0f0f0f 0%, #1a1a1a 100%);
+      border: 2px solid var(--cf-border);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      min-height: 800px;
+    }
+
+    .powerbi-frame {
+      width: 100%;
+      height: 750px;
+      border: none;
+      border-radius: 4px;
+      background: var(--cf-black);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 10, 10, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid var(--cf-border);
+      border-top-color: var(--cf-red);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      margin-top: 20px;
+      color: var(--cf-light-gray);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    /* Info Banner */
+    .info-banner {
+      background: rgba(229, 25, 55, 0.1);
+      border: 1px solid rgba(229, 25, 55, 0.3);
+      border-left: 4px solid var(--cf-red);
+      border-radius: 4px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .info-banner-icon {
+      font-size: 24px;
+    }
+
+    .info-banner-content h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--cf-red);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    .info-banner-content p {
+      font-size: 13px;
+      color: var(--cf-light-gray);
+      line-height: 1.5;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+      }
+
+      .header-left {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .user-info {
+        padding-left: 0;
+        border-left: none;
+        padding-top: 15px;
+        border-top: 2px solid var(--cf-border);
+      }
+
+      .main-content {
+        padding: 20px;
+      }
+
+      .dashboard-tabs {
+        flex-direction: column;
+      }
+
+      .tab {
+        border-bottom: none;
+        border-left: 3px solid transparent;
+      }
+
+      .tab.active {
+        border-left-color: var(--cf-red);
+        border-bottom-color: transparent;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-small">CROSSFIT GAMES 2019</div>
+      <div class="user-info">
+        <div class="user-avatar">👨‍🏫</div>
+        <div class="user-details">
+          <h3 id="userName">Coach</h3>
+          <p>Tableau de bord Coach</p>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-secondary" onclick="window.print()">📊 Exporter</button>
+      <button class="btn btn-logout" onclick="logout()">🚪 Déconnexion</button>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="welcome-section">
+      <h1>👋 Bienvenue, Coach</h1>
+      <p>Accédez à vos analyses de performance et suivez la progression de vos athlètes aux CrossFit Games 2019</p>
+    </div>
+
+
+    <!-- Dashboard Tabs -->
+    <div class="dashboard-tabs">
+      <button class="tab active" onclick="switchTab('page1')">📊 Vue d'ensemble</button>
+     
+    </div>
+
+    <!-- Page 1 Content -->
+    <div id="page1" class="tab-content active">
+      <div class="powerbi-container">
+        
+        <!-- Replace with your Power BI Embed URL for Coach Page 1 -->
+<iframe title="crossfit-coach" width="1400" height="600" src="https://app.powerbi.com/reportEmbed?reportId=829714f2-2539-44dc-9fd3-20e1a1c16ea9&autoAuth=true&ctid=604f1a96-cbe8-43f8-abbf-f8eaf5d85730" frameborder="0" allowFullScreen="true"></iframe>      </div>
+    </div>
+
+    <!-- Page 2 Content -->
+    <div id="page2" class="tab-content">
+      <div class="powerbi-container">
+        
+        <!-- Replace with your Power BI Embed URL for Coach Page 2 -->
+<iframe title="crossfit-coach" width="1400" height="600" src="https://app.powerbi.com/reportEmbed?reportId=829714f2-2539-44dc-9fd3-20e1a1c16ea9&autoAuth=true&ctid=604f1a96-cbe8-43f8-abbf-f8eaf5d85730" frameborder="0" allowFullScreen="true"></iframe>      </div>
+    </div>
+  </main>
+
+  <script>
+    // Get user session data
+    const userSession = window.userSession || { username: 'Coach', role: 'coach' };
+    document.getElementById('userName').textContent = userSession.username || 'Coach';
+
+    // Tab switching
+    function switchTab(tabId) {
+      // Hide all tab contents
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+      
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // Show selected tab content
+      document.getElementById(tabId).classList.add('active');
+      
+      // Add active class to clicked tab
+      event.target.classList.add('active');
+    }
+
+    // Hide loading overlay
+    function hideLoading(loadingId) {
+      const loadingEl = document.getElementById(loadingId);
+      if (loadingEl) {
+        setTimeout(() => {
+          loadingEl.style.display = 'none';
+        }, 500);
+      }
+    }
+
+    // Logout function
+    function logout() {
+      if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+        window.userSession = null;
+        window.location.href = 'power_bi_dashboard.html'; // Replace with your login page name
+      }
+    }
+
+    
+  </script>
+</body>
+</html>
