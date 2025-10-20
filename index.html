@@ -366,11 +366,11 @@
 
       <form id="loginForm">
         <div class="form-group">
-          <label for="username">Nom d'utilisateur</label>
+          <label for="username">Email</label>
           <input 
             type="text" 
             id="username" 
-            placeholder="Entrez votre nom d'utilisateur" 
+            placeholder="Entrez votre Email" 
             required 
             autocomplete="username"
           />
@@ -498,7 +498,7 @@
           
         } else {
           setLoading(false);
-          showError('❌ Nom d\'utilisateur, mot de passe ou rôle incorrect');
+          showError('❌ Email, mot de passe ou rôle incorrect');
           
           // Shake animation
           loginForm.style.animation = 'shake 0.5s';
